@@ -22,7 +22,7 @@
             border: 1px solid #00ff88;
         }
         h2 { color: #00ff88; margin-bottom: 20px; text-align: center; }
-        input, select {
+        input {
             width: 100%;
             padding: 12px;
             margin: 10px 0;
@@ -97,7 +97,6 @@
 <body>
 <div class="container" id="app">
 
-    <!-- LOGIN SECTION -->
     <div id="loginSection">
         <div class="card">
             <h2>🔐 GIFT CARD SHOP</h2>
@@ -108,7 +107,6 @@
         </div>
     </div>
 
-    <!-- REGISTER SECTION -->
     <div id="registerSection" class="hidden">
         <div class="card">
             <h2>📝 REGISTER</h2>
@@ -120,12 +118,11 @@
         </div>
     </div>
 
-    <!-- BOT VERIFICATION SECTION -->
     <div id="botSection" class="hidden">
         <div class="card">
             <h2>🤖 VERIFY YOUR TELEGRAM</h2>
             <p>1. Click below to open Telegram bot</p>
-            <a href="https://t.me/GiftCardShopBot" target="_blank" class="telegram-link">📱 Open Bot on Telegram</a>
+            <a href="https://t.me/Giftclerkbot" target="_blank" class="telegram-link">📱 Open @Giftclerkbot on Telegram</a>
             <p>2. Send <strong>/start</strong> to the bot</p>
             <p>3. Bot will give you a <strong style="color:#00ff88;">UNIQUE CODE</strong></p>
             <p>4. Paste that code below:</p>
@@ -135,7 +132,6 @@
         </div>
     </div>
 
-    <!-- SHOP SECTION -->
     <div id="shopSection" class="hidden">
         <div class="card">
             <h2>🛍️ Welcome, <span id="userNameDisplay"></span></h2>
@@ -156,7 +152,6 @@
         </div>
     </div>
 
-    <!-- ORDERS SECTION -->
     <div id="ordersSection" class="hidden">
         <div class="card">
             <h2>📦 MY ORDERS</h2>
@@ -165,7 +160,6 @@
         </div>
     </div>
 
-    <!-- PAYMENT SECTION -->
     <div id="paymentSection" class="hidden">
         <div class="card">
             <h2>💳 COMPLETE PAYMENT</h2>
@@ -188,7 +182,6 @@
     let currentGift = null;
     let currentPlatform = "amazon";
     
-    // Price calculation: User pays 50% of gift value (min ₹25)
     function calculatePrice(value) {
         let price = Math.ceil(value / 2);
         return price < 25 ? 25 : price;
@@ -304,7 +297,6 @@
         backToShop();
     }
     
-    // Platform selection
     document.querySelectorAll('.platform-btn').forEach(btn => {
         btn.onclick = () => {
             document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
@@ -314,7 +306,6 @@
         };
     });
     
-    // Auth functions
     function showRegister() {
         document.getElementById('loginSection').classList.add('hidden');
         document.getElementById('registerSection').classList.remove('hidden');
@@ -378,7 +369,6 @@
             return;
         }
         
-        // Check with bot if code is valid
         fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates`).then(res => res.json()).then(data => {
             let found = false;
             if(data.ok && data.result) {
@@ -400,7 +390,7 @@
                 document.getElementById('shopSection').classList.remove('hidden');
                 loadGifts();
             } else {
-                alert('Invalid code. Please get a new code from bot.');
+                alert('Invalid code. Please send /start to @Giftclerkbot and get a new code.');
             }
         });
     }
