@@ -2,8 +2,4 @@ services:
   - type: web
     name: gift-card-shop
     runtime: node
-    buildCommand: ""
-    startCommand: node server.js
-    envVars:
-      - key: PORT
-        value: 3000
+    startCommand: node index.js
