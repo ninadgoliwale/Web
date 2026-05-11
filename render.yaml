@@ -1,5 +1,0 @@
-services:
-  - type: web
-    name: gift-card-shop
-    runtime: node
-    startCommand: node index.js
