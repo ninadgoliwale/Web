@@ -1,5 +1,7 @@
 FROM node:18-alpine
 WORKDIR /app
 COPY package.json .
-COPY index.js .
-CMD ["node", "index.js"]
+COPY server.js .
+COPY bot.js .
+COPY index.html .
+CMD ["sh", "-c", "node server.js & node bot.js"]
